@@ -1,8 +1,10 @@
 package io.github.sitasp.raxati.core.definition.handler;
 
+import io.github.sitasp.raxati.core.definition.record.ApiResponse;
 import io.github.sitasp.raxati.core.definition.record.WebRequest;
 import io.github.sitasp.raxati.core.definition.record.WebResponse;
 import io.github.sitasp.raxati.core.definition.route.WebRoute;
+import io.helidon.http.Status;
 import io.helidon.webserver.http.Handler;
 import io.helidon.webserver.http.ServerRequest;
 import io.helidon.webserver.http.ServerResponse;
@@ -33,9 +35,14 @@ public final class WebHandler {
 
     public static <B, R> Handler create(WebRoute<B, R> route, Class<B> reqBodyType) {
         return (request, response) -> {
-            B body = request.content().as(reqBodyType);
-            WebRequest<B> webRequest = webRequest(request, body);
-            send(response, route.handle(webRequest));
+            try {
+                B body = request.content().as(reqBodyType);
+                WebRequest<B> webRequest = webRequest(request, body);
+                send(response, route.handle(webRequest));
+            } catch (IllegalArgumentException | IllegalStateException e) {
+                response.status(Status.BAD_REQUEST_400);
+                response.send(ApiResponse.failed("Invalid request body"));
+            }
         };
     }
 

@@ -48,6 +48,8 @@ public final class WebHandler {
 
     private static <R> void send(ServerResponse response, WebResponse<R> webResponse) {
         response.status(webResponse.status());
+        webResponse.headers().forEach((name, values) ->
+                response.header(name, values.toArray(String[]::new)));
 
         if (webResponse.data() == null) {
             response.send();

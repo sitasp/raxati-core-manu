@@ -4,6 +4,7 @@ import io.github.sitasp.raxati.core.definition.record.ApiResponse;
 import io.github.sitasp.raxati.core.definition.record.WebRequest;
 import io.github.sitasp.raxati.core.definition.record.WebResponse;
 import io.github.sitasp.raxati.core.definition.route.WebRoute;
+import io.helidon.http.HeaderValues;
 import io.helidon.http.Status;
 import io.helidon.webserver.http.Handler;
 import io.helidon.webserver.http.ServerRequest;
@@ -49,7 +50,7 @@ public final class WebHandler {
     private static <R> void send(ServerResponse response, WebResponse<R> webResponse) {
         response.status(webResponse.status());
         webResponse.headers().forEach((name, values) ->
-                response.header(name, values.toArray(String[]::new)));
+                response.header(HeaderValues.create(name, values)));
 
         if (webResponse.data() == null) {
             response.send();
